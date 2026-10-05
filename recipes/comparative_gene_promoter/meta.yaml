@@ -1,4 +1,4 @@
-{% set name = "comparative-gene-promoter" %}
+{% set name = "comparative_gene_promoter" %}
 {% set version = "0.1.0" %}
 
 package:
@@ -6,11 +6,14 @@ package:
   version: {{ version }}
 
 source:
-  path: ../..
+  url: https://github.com/ausswal/comparative-gene-promoter/archive/refs/tags/v0.1.0.tar.gz
+  sha256: REPLACE_WITH_REAL_SHA256
 
 build:
   number: 0
   noarch: generic
+  run_exports:
+    - {{ pin_subpackage(name, max_pin="x.x") }}
 
 requirements:
   host:
@@ -21,7 +24,7 @@ requirements:
     - pandas
     - numpy
     - scipy
-    - matplotlib
+    - matplotlib-base
     - seaborn
     - biopython
     - openpyxl
@@ -49,7 +52,7 @@ test:
     - "command -v fasttree"
 
 about:
-  home: https://github.com/YOUR_GITHUB_USERNAME/comparative-gene-promoter
+  home: https://github.com/ausswal/comparative-gene-promoter
   license: MIT
   license_file: LICENSE.txt
   summary: Comparative gene family and promoter analysis pipeline
@@ -58,8 +61,8 @@ about:
     protein, promoter, transcription-start-site, nucleotide composition,
     core promoter element, motif, CpG, DNA structural property,
     and phylogenetic analyses.
-  dev_url: https://github.com/YOUR_GITHUB_USERNAME/comparative-gene-promoter
+  dev_url: https://github.com/ausswal/comparative-gene-promoter
 
 extra:
   recipe-maintainers:
-    - YOUR_GITHUB_USERNAME
+    - ausswal

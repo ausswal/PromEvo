@@ -6,6 +6,7 @@ Run it with:   comparative-gene-promoter-check
 Exit code 0 = everything the pipeline needs is present, 1 = something is missing.
 """
 import importlib
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -70,14 +71,26 @@ def main() -> int:
     else:
         problems += 1
         print("  [MISSING] master_script_*.py")
-    # databases live next to the scripts (07c looks in <script folder>/databases)
-    dbs = next((d for d in (scripts / "databases", HERE / "databases")
-                if d.is_dir() and any(d.iterdir())), scripts / "databases")
-    if dbs.is_dir() and any(dbs.iterdir()):
-        print(f"  [OK]      motif databases in {dbs}")
+    # Motif databases are NOT bundled in the package: Stage 00 downloads them on the first run.
+    # Same lookup order as 00_setup_motif_databases.py / 07c:
+    #   1. $COMPARATIVE_PIPELINE_DATABASES   2. $XDG_DATA_HOME/comparative-gene-promoter/databases
+    #   3. ~/.local/share/comparative-gene-promoter/databases
+    candidates = []
+    if os.environ.get("COMPARATIVE_PIPELINE_DATABASES"):
+        candidates.append(Path(os.environ["COMPARATIVE_PIPELINE_DATABASES"]).expanduser())
+    if os.environ.get("XDG_DATA_HOME"):
+        candidates.append(Path(os.environ["XDG_DATA_HOME"]) / "comparative-gene-promoter" / "databases")
+    candidates.append(Path.home() / ".local" / "share" / "comparative-gene-promoter" / "databases")
+    needed = ("JASPAR2026_CORE.meme", "UniProbe_Combined.meme")
+    found = next((d for d in candidates if all((d / n).is_file() and (d / n).stat().st_size > 0
+                                               for n in needed)), None)
+    if found:
+        print(f"  [OK]      motif databases (JASPAR + UniProbe) in {found}")
     else:
-        print(f"  [WARN]    no motif databases in {dbs} (07c needs them; "
-              f"00_setup_motif_databases.py can create them)")
+        # Not a failure: the package does not ship them and the conda-build test has no network.
+        print("  [INFO]    motif databases not downloaded yet -- Stage 00 fetches JASPAR + UniProbe "
+              "on the first pipeline run (internet needed once)")
+        print(f"            they will be stored in: {candidates[0]}")
 
     print("\n" + "=" * 62)
     print(" RESULT:", "all checks passed" if problems == 0 else f"{problems} problem(s) found")

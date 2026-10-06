@@ -101,3 +101,8 @@ Some stages have more than one similarly-named script in this directory
 pair is referenced by `master_script_8.py`'s `STAGES` list at any given
 time -- check that list directly if you're unsure which is the active
 one before editing.
+## Authors
+
+Swarup Das¹, Subarna Thakur¹
+
+¹ Department of Bioinformatics, University of North Bengal, Bagdogra, Bairatisal, Darjeeling, West Bengal 734013, India

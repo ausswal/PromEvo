@@ -56,7 +56,7 @@ fi
 # INSTALL DOCUMENTATION
 # =============================================================================
 
-for f in README.md LICENSE.txt environment.yml; do
+for f in README.md LICENSE.txt AUTHORS.md environment.yml; do
     if [ -f "${SRC_DIR}/${f}" ]; then
         cp "${SRC_DIR}/${f}" "${PACKAGE_DIR}/${f}"
         echo "[OK] ${f} installed."
@@ -107,6 +107,13 @@ PIPELINE_DIR="${PREFIX_DIR}/share/comparative-gene-promoter"
 {
     printf '%s\n' "${HEADER}"
     cat <<'EOF'
+case "${1:-}" in
+    --authors|--about)
+        cat "${PIPELINE_DIR}/AUTHORS.md"
+        exit 0
+        ;;
+esac
+
 if [ ! -f "${PIPELINE_DIR}/run_pipeline.sh" ]; then
     echo "[ERROR] Pipeline launcher not found:"
     echo "        ${PIPELINE_DIR}/run_pipeline.sh"
@@ -148,9 +155,23 @@ exec "${PREFIX_DIR}/bin/python" "${CHECKER}" "$@"
 EOF
 } > "${PREFIX}/bin/comparative-gene-promoter-check"
 
+# ---- comparative-gene-promoter-authors --------------------------------------
+{
+    printf '%s\n' "${HEADER}"
+    cat <<'EOF'
+if [ ! -f "${PIPELINE_DIR}/AUTHORS.md" ]; then
+    echo "[ERROR] AUTHORS.md not found in ${PIPELINE_DIR}"
+    exit 1
+fi
+
+cat "${PIPELINE_DIR}/AUTHORS.md"
+EOF
+} > "${PREFIX}/bin/comparative-gene-promoter-authors"
+
 chmod +x "${PREFIX}/bin/comparative-gene-promoter" \
          "${PREFIX}/bin/comparative-gene-promoter-master" \
-         "${PREFIX}/bin/comparative-gene-promoter-check"
+         "${PREFIX}/bin/comparative-gene-promoter-check" \
+         "${PREFIX}/bin/comparative-gene-promoter-authors"
 
 # =============================================================================
 # FINAL BUILD INFORMATION
@@ -168,6 +189,7 @@ echo "[INFO] Installed commands:"
 echo "       comparative-gene-promoter"
 echo "       comparative-gene-promoter-master"
 echo "       comparative-gene-promoter-check"
+echo "       comparative-gene-promoter-authors"
 echo
 echo "[INFO] Motif databases are NOT packaged."
 echo "[INFO] JASPAR and UniProbe databases will be downloaded by Stage 00."

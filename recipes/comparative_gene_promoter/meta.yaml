@@ -6,19 +6,15 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/ausswal/comparative-gene-promoter/archive/refs/tags/v0.1.0.tar.gz
-  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  url: https://github.com/ausswal/comparative-gene-promoter/archive/refs/tags/v{{ version }}.tar.gz
+  # Replace with: sha256sum of the tarball downloaded from the URL above
+  sha256: REPLACE_WITH_GITHUB_TARBALL_SHA256
 
 build:
   number: 0
   noarch: generic
-  run_exports:
-    - {{ pin_subpackage(name, max_pin="x.x") }}
 
 requirements:
-  host:
-    - python >=3.10,<3.14
-
   run:
     - python >=3.10,<3.14
     - pandas
@@ -42,18 +38,19 @@ test:
   commands:
     - comparative-gene-promoter-check
     - datasets --version
-    - "command -v mafft"
-    - "command -v meme"
-    - "command -v tomtom"
-    - "command -v ceqlogo"
-    - "command -v orthofinder"
-    - "command -v diamond"
-    - "command -v mcl"
-    - "command -v fasttree"
+    - command -v mafft
+    - command -v meme
+    - command -v tomtom
+    - command -v ceqlogo
+    - command -v orthofinder
+    - command -v diamond
+    - command -v mcl
+    - command -v fasttree
 
 about:
   home: https://github.com/ausswal/comparative-gene-promoter
   license: MIT
+  license_family: MIT
   license_file: LICENSE.txt
   summary: Comparative gene family and promoter analysis pipeline
   description: |
@@ -65,4 +62,6 @@ about:
 
 extra:
   recipe-maintainers:
-    - ausswal
+    - Swarup Das and Dr. Subarna Thakur
+    - Department of Bioinformatics, University of North Bengal
+    - Darjeeling, West Bengal 734013, India

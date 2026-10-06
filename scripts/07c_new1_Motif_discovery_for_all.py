@@ -194,100 +194,57 @@ else:
 
 
 def resolve_database_directory():
+    """
+    Must match Stage 00 exactly.
 
-    # -------------------------------------------------------------------------
-    # 1. Explicit user-defined database location
-    # -------------------------------------------------------------------------
+    Priority:
+        1. COMPARATIVE_PIPELINE_DATABASES
+        2. $XDG_DATA_HOME/comparative-gene-promoter/databases
+        3. ~/.local/share/comparative-gene-promoter/databases
+        4. legacy locations (package dir, scripts dir, old ~/.cache, CONDA_PREFIX)
 
-    env_database_dir = os.environ.get(
-        "COMPARATIVE_PIPELINE_DATABASES"
-    )
+    07c never creates the directory; Stage 00 does.
+    """
+
+    env_database_dir = os.environ.get("COMPARATIVE_PIPELINE_DATABASES")
 
     if env_database_dir:
+        return Path(env_database_dir).expanduser().resolve()
 
-        return (
-            Path(env_database_dir)
-            .expanduser()
-            .resolve()
-        )
+    xdg_data_home = os.environ.get("XDG_DATA_HOME")
 
-
-    # -------------------------------------------------------------------------
-    # 2. XDG cache location
-    # -------------------------------------------------------------------------
-
-    xdg_cache_home = os.environ.get(
-        "XDG_DATA_HOME"
-    )
-
-    if xdg_cache_home:
-
-        xdg_database_dir = (
-            Path(xdg_cache_home)
-            .expanduser()
-            .resolve()
-            / "comparative-gene-promoter"
-            / "databases"
-        )
-
+    if xdg_data_home:
+        base = Path(xdg_data_home).expanduser()
     else:
+        base = Path.home() / ".local" / "share"
 
-        xdg_database_dir = (
-            Path.home()
-            / ".cache"
-            / "comparative-gene-promoter"
-            / "databases"
-        )
+    user_database_dir = base / "comparative-gene-promoter" / "databases"
 
-
-    # -------------------------------------------------------------------------
-    # 3. Preferred user cache directory
-    # -------------------------------------------------------------------------
-
-    if xdg_database_dir.exists():
-
-        return xdg_database_dir.resolve()
-
-
-    # -------------------------------------------------------------------------
-    # 4. Legacy package-level database directory
-    #
-    # This is retained for compatibility with older installations.
-    # -------------------------------------------------------------------------
+    if user_database_dir.is_dir():
+        return user_database_dir.resolve()
 
     legacy_candidates = [
-
         PACKAGE_DIR / "databases",
-
         SCRIPTS_DIR / "databases",
-
-        Path(
-            os.environ.get(
-                "CONDA_PREFIX",
-                ""
-            )
-        )
-        / "share"
-        / "comparative-gene-promoter"
-        / "databases",
+        Path.home() / ".cache" / "comparative-gene-promoter" / "databases",
     ]
 
+    conda_prefix = os.environ.get("CONDA_PREFIX")
+
+    if conda_prefix:
+        legacy_candidates.append(
+            Path(conda_prefix)
+            / "share"
+            / "comparative-gene-promoter"
+            / "databases"
+        )
 
     for candidate in legacy_candidates:
-
-        if candidate.exists() and candidate.is_dir():
-
+        if candidate.is_dir():
             return candidate.resolve()
 
-
-    # -------------------------------------------------------------------------
-    # 5. Return preferred cache location even if it does not yet exist.
-    #
-    # Stage 07c will report that the databases are missing.
-    # It will NOT create the directory.
-    # -------------------------------------------------------------------------
-
-    return xdg_database_dir.resolve()
+    # Not found: report the location Stage 00 will create.
+    return user_database_dir.resolve()
 
 
 DATABASES_DIR = resolve_database_directory()

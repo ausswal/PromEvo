@@ -456,6 +456,16 @@ if all_results:
             f"{seq_type} — All DNA Structural Properties by Species",
             group_col='Species'
         )
+        # Genus-wise comparison: one box per GENUS in every property panel
+        # (only meaningful when the data holds more than one genus).
+        if group['Genus'].nunique() > 1:
+            save_facet_grid(
+                group,
+                [os.path.join(PLOT_DIR, f"{seq_type}_ALL_PROPERTIES_BY_GENUS_GRID.png"),
+                 os.path.join(BASE_OUTPUT, f"{seq_type}_ALL_PROPERTIES_BY_GENUS_GRID.png")],
+                f"{seq_type} — All DNA Structural Properties by Genus",
+                group_col='Genus'
+            )
 
     # ==========================================================================
     # 5. BY-GENUS / BY-ORGANISM OUTPUT TREES (additive -- outputs above are

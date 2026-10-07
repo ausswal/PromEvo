@@ -2,3 +2,9 @@ outputs/
 Local_testing/
 Local_build.txt
 *.yaml.github
+*_dashboard.html
+Entamoeba/
+Ncbi_plasmodium/
+*_dashboard.html
+Entamoeba/
+Ncbi_plasmodium/

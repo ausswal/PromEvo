@@ -22,15 +22,6 @@ interactive prompt. If you're not ready to start a real run yet, it's
 safe to `Ctrl+C` once it reaches that prompt -- the environment and
 databases are already fully set up by that point.
 
-**Option B -- from the environment spec directly:**
-```bash
-conda env create -f environment.yml
-conda activate gene_promoter_env
-python 00_setup_motif_databases.py
-```
-Use this if you want the environment without immediately launching the
-pipeline, or if you're recreating the environment on a new machine and
-want the standard `conda env create` workflow.
 
 ## Verifying the setup
 
@@ -47,7 +38,7 @@ checks that a real run would have what it needs.
 
 ```bash
 conda activate gene_promoter_env
-python master_script_8.py
+python master_script_10.py
 ```
 
 Useful flags (see `python master_script_8.py --list` for the full stage
@@ -63,9 +54,7 @@ Stage 01 supports two modes:
 - **NCBI mode** -- fetches sequences and promoters directly from NCBI for
   named organisms.
 - **Local mode** -- scans one or more local directories of genome
-  FASTA + GFF (optionally with a companion protein FASTA, e.g. VEuPathDB's
-  `..._AnnotatedProteins.fasta`, for real protein-based analysis instead
-  of nucleotide).
+  FASTA + GFF for analysis).
 
 Whichever mode is used, the fetch stage writes
 `outputs/.pipeline_data_manifest.json` recording whether real protein
@@ -76,7 +65,7 @@ rather than producing meaningless output.
 
 ## Repository layout
 
-- `master_script_8.py` -- orchestrates all pipeline stages in order.
+- `master_script_10.py` -- orchestrates all pipeline stages in order.
 - `run_pipeline.sh` -- one-command environment setup + launch.
 - `environment.yml` -- conda environment specification (see above).
 - `environment_check.py` -- pre-flight verification (packages/tools/syntax).

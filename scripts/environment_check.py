@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Environment check for the comparative-gene-promoter pipeline.
+Environment check for the PromEvo pipeline.
 
-Run it with:   comparative-gene-promoter-check
+Run it with:   promevo-check
 Exit code 0 = everything the pipeline needs is present, 1 = something is missing.
 """
 import importlib
@@ -35,7 +35,7 @@ HERE = Path(__file__).resolve().parent
 def main() -> int:
     problems = 0
     print("=" * 62)
-    print(" comparative-gene-promoter : environment check")
+    print(" PromEvo : environment check")
     print("=" * 62)
     print(f"Python {sys.version.split()[0]}  ({sys.executable})")
 

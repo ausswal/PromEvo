@@ -1,4 +1,4 @@
-{% set name = "comparative_gene_promoter" %}
+{% set name = "promevo" %}
 {% set version = "0.1.0" %}
 
 package:
@@ -36,7 +36,7 @@ requirements:
 
 test:
   commands:
-    - comparative-gene-promoter-check
+    - promevo-check
     - datasets --version
     - command -v mafft
     - command -v meme
@@ -52,7 +52,7 @@ about:
   license: MIT
   license_family: MIT
   license_file: LICENSE.txt
-  summary: Comparative gene family and promoter analysis pipeline
+  summary: PromEvo - comparative gene family and promoter analysis pipeline
   description: |
     A Python-based comparative bioinformatics pipeline for gene-family,
     protein, promoter, transcription-start-site, nucleotide composition,
@@ -62,6 +62,4 @@ about:
 
 extra:
   recipe-maintainers:
-    - Swarup Das and Dr. Subarna Thakur
-    - Department of Bioinformatics, University of North Bengal
-    - Darjeeling, West Bengal 734013, India
+    - ausswal

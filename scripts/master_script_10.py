@@ -2,6 +2,7 @@
 
 """
 ==============================================================================
+                              PromEvo
         COMPARATIVE GENE FAMILY & PROMOTER ANALYSIS
                         MASTER PIPELINE
 ==============================================================================
@@ -367,9 +368,38 @@ def timestamp():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def print_header():
-    """Print main pipeline header."""
+BANNER_ART = [
+    ' _____                     ______',
+    '|  __ \\                   |  ____|',
+    '| |__) | __ ___  _ __ ___ | |____   _____',
+    "|  ___/ '__/ _ \\| '_ ` _ \\|  __\\ \\ / / _ \\",
+    '| |   | | | (_) | | | | | | |___\\ V / (_) |',
+    '|_|   |_|  \\___/|_| |_| |_|______\\_/ \\___/',
+]
 
+
+def _colour_banner(lines):
+    """Two-tone banner (orange bars, blue strokes) on colour terminals only."""
+    use_colour = sys.stdout.isatty() and not os.environ.get("NO_COLOR")
+    if not use_colour:
+        return list(lines)
+    orange, blue, reset = "\033[38;5;208m", "\033[38;5;39m", "\033[0m"
+    out = []
+    for line in lines:
+        out.append("".join(
+            (orange if ch == "|" else blue) + ch + reset if ch != " " else ch
+            for ch in line
+        ))
+    return out
+
+
+def print_banner():
+    """PromEvo ASCII banner, title and credits (also used by the launcher)."""
+
+    print()
+    print("=" * 78)
+    for line in _colour_banner(BANNER_ART):
+        print(line)
     print()
     print("=" * 78)
     print("        COMPARATIVE GENE FAMILY & PROMOTER ANALYSIS")
@@ -378,6 +408,13 @@ def print_header():
     print("  Developed by: Swarup Das & Subarna Thakur")
     print("  Department of Bioinformatics, University of North Bengal")
     print("  Raja Rammohunpur, Bagdogra, Bairatisal, West Bengal 734013")
+
+
+def print_header():
+    """Print main pipeline header."""
+
+    if not os.environ.get("PROMEVO_BANNER_SHOWN"):
+        print_banner()
     print("Working directory:", WORK_DIR)
     print("Output directory :", OUTPUT_DIR)
     print("Python executable:", PYTHON)

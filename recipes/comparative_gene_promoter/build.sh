@@ -3,7 +3,7 @@
 set -euo pipefail
 
 echo "=============================================================================="
-echo "             BUILDING COMPARATIVE GENE & PROMOTER PIPELINE"
+echo "             BUILDING PromEvo"
 echo "=============================================================================="
 
 echo "[INFO] Conda prefix : ${PREFIX}"
@@ -103,7 +103,7 @@ export PATH="${PREFIX_DIR}/bin:${PATH}"
 PIPELINE_DIR="${PREFIX_DIR}/share/comparative-gene-promoter"
 '
 
-# ---- comparative-gene-promoter ----------------------------------------------
+# ---- promevo ----------------------------------------------
 {
     printf '%s\n' "${HEADER}"
     cat <<'EOF'
@@ -122,9 +122,9 @@ fi
 
 exec bash "${PIPELINE_DIR}/run_pipeline.sh" "$@"
 EOF
-} > "${PREFIX}/bin/comparative-gene-promoter"
+} > "${PREFIX}/bin/promevo"
 
-# ---- comparative-gene-promoter-master ---------------------------------------
+# ---- promevo-master ---------------------------------------
 {
     printf '%s\n' "${HEADER}"
     printf 'MASTER="${PIPELINE_DIR}/scripts/%s"\n\n' "${MASTER_BASENAME}"
@@ -137,9 +137,9 @@ fi
 
 exec "${PREFIX_DIR}/bin/python" "${MASTER}" "$@"
 EOF
-} > "${PREFIX}/bin/comparative-gene-promoter-master"
+} > "${PREFIX}/bin/promevo-master"
 
-# ---- comparative-gene-promoter-check ----------------------------------------
+# ---- promevo-check ----------------------------------------
 {
     printf '%s\n' "${HEADER}"
     cat <<'EOF'
@@ -153,9 +153,9 @@ fi
 
 exec "${PREFIX_DIR}/bin/python" "${CHECKER}" "$@"
 EOF
-} > "${PREFIX}/bin/comparative-gene-promoter-check"
+} > "${PREFIX}/bin/promevo-check"
 
-# ---- comparative-gene-promoter-authors --------------------------------------
+# ---- promevo-authors --------------------------------------
 {
     printf '%s\n' "${HEADER}"
     cat <<'EOF'
@@ -166,12 +166,12 @@ fi
 
 cat "${PIPELINE_DIR}/AUTHORS.md"
 EOF
-} > "${PREFIX}/bin/comparative-gene-promoter-authors"
+} > "${PREFIX}/bin/promevo-authors"
 
-chmod +x "${PREFIX}/bin/comparative-gene-promoter" \
-         "${PREFIX}/bin/comparative-gene-promoter-master" \
-         "${PREFIX}/bin/comparative-gene-promoter-check" \
-         "${PREFIX}/bin/comparative-gene-promoter-authors"
+chmod +x "${PREFIX}/bin/promevo" \
+         "${PREFIX}/bin/promevo-master" \
+         "${PREFIX}/bin/promevo-check" \
+         "${PREFIX}/bin/promevo-authors"
 
 # =============================================================================
 # FINAL BUILD INFORMATION
@@ -186,10 +186,10 @@ echo "[INFO] Scripts directory : ${SCRIPTS_DIR}"
 echo "[INFO] Master script     : ${MASTER_BASENAME}"
 echo
 echo "[INFO] Installed commands:"
-echo "       comparative-gene-promoter"
-echo "       comparative-gene-promoter-master"
-echo "       comparative-gene-promoter-check"
-echo "       comparative-gene-promoter-authors"
+echo "       promevo"
+echo "       promevo-master"
+echo "       promevo-check"
+echo "       promevo-authors"
 echo
 echo "[INFO] Motif databases are NOT packaged."
 echo "[INFO] JASPAR and UniProbe databases will be downloaded by Stage 00."

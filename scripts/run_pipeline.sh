@@ -1,25 +1,17 @@
 #!/usr/bin/env bash
-# Launcher for the Comparative Gene & Promoter Pipeline.
+# Launcher for PromEvo (comparative gene family & promoter analysis).
 # Uses the currently active Conda environment and preserves the user's
 # current working directory.
 
 set -euo pipefail
 shopt -s nullglob
 
-echo "=============================================================================="
-echo "                   COMPARATIVE GENE & PROMOTER PIPELINE"
-echo "=============================================================================="
-
 if [ -z "${CONDA_PREFIX:-}" ]; then
     echo "[ERROR] No conda environment is active."
-    echo "        Activate the environment where comparative-gene-promoter is installed."
-    echo "        Example: conda activate comparative-gene-promoter-test"
+    echo "        Activate the environment where promevo is installed."
+    echo "        Example: conda activate promevo"
     exit 1
 fi
-
-echo "[INFO] Conda environment : ${CONDA_PREFIX}"
-echo "[INFO] Working directory : $(pwd)"
-echo "       (input genome folders are read from here; outputs/ is written here)"
 
 export COMPARATIVE_PIPELINE_WORKDIR="$(pwd)"
 
@@ -56,14 +48,38 @@ fi
 MASTER="${masters[0]}"
 SETUP_DB="${SCRIPTS_DIR}/00_setup_motif_databases.py"
 
+# -----------------------------------------------------------------------------
+# PromEvo banner (printed by the master script so there is a single source).
+# The master skips its own copy when PROMEVO_BANNER_SHOWN is set.
+# -----------------------------------------------------------------------------
+if python - "${MASTER}" <<'PYEOF' 2>/dev/null
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("promevo_master", sys.argv[1])
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
+mod.print_banner()
+PYEOF
+then
+    export PROMEVO_BANNER_SHOWN=1
+else
+    echo "=============================================================================="
+    echo "                                 PromEvo"
+    echo "        COMPARATIVE GENE FAMILY & PROMOTER ANALYSIS"
+    echo "=============================================================================="
+fi
+
+echo
+echo "[INFO] Conda environment : ${CONDA_PREFIX}"
+echo "[INFO] Working directory : $(pwd)"
+echo "       (input genome folders are read from here; outputs/ is written here)"
 echo "[INFO] Pipeline scripts  : ${SCRIPTS_DIR}"
 echo "[INFO] Master script     : $(basename "${MASTER}")"
 
 echo
 echo "[INFO] Verifying required tools..."
 
-if command -v comparative-gene-promoter-check >/dev/null 2>&1; then
-    if ! check_output="$(comparative-gene-promoter-check 2>&1)"; then
+if command -v promevo-check >/dev/null 2>&1; then
+    if ! check_output="$(promevo-check 2>&1)"; then
         echo "${check_output}"
         echo "[ERROR] The environment is incomplete."
         exit 1

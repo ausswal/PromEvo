@@ -190,7 +190,15 @@ GENUS_SECTIONS = [
             },
             {
                 "label": "DNA Structural Properties (genus-wise)",
+                # Prefer the genus-pooled plot. The old "{group}/**/*.png"
+                # pattern took the alphabetically first PNG, and
+                # "<Genus>_<Type>_by_species_grid.png" sorts before
+                # "<Genus>_<Type>_structural_boxplot.png", so the per-species
+                # grid was shown instead of the genus plot.
                 "patterns": [
+                    "DNA_Structural_Properties_By_Genus/{group}/{group}_Promoters_structural_boxplot.png",
+                    "DNA_Structural_Properties_By_Genus/{group}/{group}_*_structural_boxplot.png",
+                    "DNA_Structural_Properties_By_Genus/{group}/**/*structural_boxplot*.png",
                     "DNA_Structural_Properties_By_Genus/{group}/**/*.png",
                     "**/{group}*structural*propert*.png",
                 ],

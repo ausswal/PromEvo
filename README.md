@@ -77,7 +77,7 @@ To stop a run press **Ctrl+C**. Do not use Ctrl+Z, which only suspends it.
 | 06 | Nucleotide composition analysis |
 | 07 | Core promoter element analysis |
 | 08 | Core promoter element synergism analysis |
-| 09 | Motif discovery (MEME) and TOMTOM matching |
+| 09 | Motif discovery using MEME and TOMTOM |
 | 10 | Motif logos |
 | 11 | Motif conservation analysis |
 | 12 | Motif distribution (organism and genus) |

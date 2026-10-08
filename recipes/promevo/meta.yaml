@@ -8,7 +8,7 @@ package:
 source:
   url: https://github.com/ausswal/PromEvo/archive/refs/tags/v{{ version }}.tar.gz
   # Replace with: sha256sum of the tarball downloaded from the URL above
-  sha256: 658f0719f1d911c4b29cadaddf878967b0aa57d72c036be4f4b46315d33b8a7a
+  sha256: edc6ceaee9c24887ef49c37c7095ff65e00e0a6c74401a5888d663699f918359
 
 build:
   number: 0

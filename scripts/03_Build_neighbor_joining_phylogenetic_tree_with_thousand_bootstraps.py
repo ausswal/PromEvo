@@ -25,7 +25,7 @@ ALIGNED_PATH = "outputs/family_aligned.fasta"
 LABELS_PATH = "outputs/family_labels.csv"
 OUT_TREE_IMAGE = "outputs/phylogenetic_nj_tree.png"
 OUT_NEWICK_TREE = "outputs/phylogenetic_nj_tree.nwk"
-NUM_BOOTSTRAPS = 10
+NUM_BOOTSTRAPS = 1000
 
 
 def clean_gene_name(raw_str):

@@ -6,13 +6,15 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/ausswal/comparative-gene-promoter/archive/refs/tags/v{{ version }}.tar.gz
+  url: https://github.com/ausswal/PromEvo/archive/refs/tags/v{{ version }}.tar.gz
   # Replace with: sha256sum of the tarball downloaded from the URL above
-  sha256: REPLACE_WITH_GITHUB_TARBALL_SHA256
+  sha256: 658f0719f1d911c4b29cadaddf878967b0aa57d72c036be4f4b46315d33b8a7a
 
 build:
   number: 0
   noarch: generic
+  run_exports:
+    - {{ pin_subpackage(name, max_pin="x.x") }}
 
 requirements:
   run:
@@ -48,7 +50,7 @@ test:
     - command -v fasttree
 
 about:
-  home: https://github.com/ausswal/comparative-gene-promoter
+  home: https://github.com/ausswal/PromEvo
   license: MIT
   license_family: MIT
   license_file: LICENSE.txt
@@ -58,7 +60,7 @@ about:
     protein, promoter, transcription-start-site, nucleotide composition,
     core promoter element, motif, CpG, DNA structural property,
     and phylogenetic analyses.
-  dev_url: https://github.com/ausswal/comparative-gene-promoter
+  dev_url: https://github.com/ausswal/PromEvo
 
 extra:
   recipe-maintainers:

@@ -1,5 +1,10 @@
 # PromEvo
 
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23255697-blue?style=flat-square)](https://doi.org/10.5281/zenodo.23255697)
+[![bioconda](https://img.shields.io/conda/vn/bioconda/promevo?style=flat-square&label=bioconda&color=blue)](https://anaconda.org/bioconda/promevo)
+[![downloads](https://img.shields.io/conda/dn/bioconda/promevo?style=flat-square&label=downloads)](https://anaconda.org/bioconda/promevo)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE.txt)
+
 **Comparative gene-family and promoter analysis pipeline**
 
 PromEvo analyses one gene family's promoters and coding sequences across

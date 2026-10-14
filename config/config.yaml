@@ -1,0 +1,22 @@
+
+# PromEvo Snakemake config
+scripts_dir: "scripts"
+
+stages:
+  - {id: 1,  script: 01e_new9_fetch_family_and_promoters.py, after: [databases]}
+  - {id: 2,  script: 02b_organism_wise_protein_properties_export.py, after: [1], guard: protein}
+  - {id: 3,  script: 03c_new_seperate_orthofinder_run_organism_wise_phylogenetic_trees.py, after: [2], guard: protein, threads: 8}
+  - {id: 4,  script: 04b_new_new_new_organism_wise_msa_visualization.py, after: [3], guard: protein}
+  - {id: 5,  script: 05g_tss_prediction_upstream_only_single_script.py, after: [4]}
+  - {id: 6,  script: 06a_new_organism_wise_nucleotide_composition_analysis.py, after: [5]}
+  - {id: 7,  script: 06b_new_organism_wise_core_promoter_analysis.py, after: [6]}
+  - {id: 8,  script: 06c_new_organism_wise_synergism_analysis.py, after: [7]}
+  - {id: 9,  script: 07c_new1_Motif_discovery_for_all.py, after: [8, databases], threads: 8}
+  - {id: 10, script: 07e_new_generate_motif_logos_for_all.py, after: [9]}
+  - {id: 11, script: 07f_new5_for_all_motif_conservation_analysis.py, after: [10]}
+  - {id: 12, script: 07i_new_organism_and_genus_motif_distribution.py, after: [11]}
+  - {id: 13, script: 08_new_organism_wise_cpg_island_finder.py, after: [12]}
+  - {id: 14, script: 08c_gene_wise_cpg_methprimer_plots.py, after: [13]}
+  - {id: 15, script: 09_new4_dna_structural_properties_pipeline.py, after: [14]}
+  - {id: 16, script: 010_new1_nonB_dna_motif_analysis_for_all.py, after: [15]}
+  - {id: 17, script: 011u5u_generate_comparative_dashboard.py, after: [16]}

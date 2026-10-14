@@ -1,0 +1,184 @@
+import os
+import shlex
+
+# Locate config and scripts relative to the repo (<repo>/workflow/Snakefile), not the
+# current folder, so the workflow can be run from any work folder (e.g. Colab/Drive).
+REPO = os.path.abspath(os.path.join(workflow.basedir, ".."))
+configfile: os.path.join(REPO, "config", "config.yaml")
+
+# ------------------------------------------------------------
+# Pipeline Banner & Startup Greeting
+# ------------------------------------------------------------
+BANNER = r"""
+==============================================================================
+ _____                     ______
+|  __ \                   |  ____|
+| |__) | __ ___  _ __ ___ | |____   _____
+|  ___/ '__/ _ \| '_ ` _ \|  __\ \ / / _ \
+| |   | | | (_) | | | | | | |___\ V / (_) |
+|_|   |_|  \___/|_| |_| |_|______\_/ \___/
+                 
+==============================================================================
+        COMPARATIVE GENE FAMILY & PROMOTER ANALYSIS (PromEvo)
+==============================================================================
+  Developed by: Swarup Das & Subarna Thakur
+  Department of Bioinformatics, University of North Bengal
+  Raja Rammohunpur, Bagdogra, Bairatisal, West Bengal 734013
+==============================================================================
+"""
+
+onstart:
+    print(BANNER)
+
+# ------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------
+
+_sd = config.get("scripts_dir") or "scripts"
+SCRIPTS = _sd if os.path.isabs(_sd) else os.path.join(REPO, _sd)
+STAGES = {str(stage["id"]): stage for stage in config["stages"]}
+
+MANIFEST = "outputs/.pipeline_data_manifest.json"
+DB_FLAG = "outputs/.done/databases.done"
+
+# Explicit global wildcard constraints
+wildcard_constraints:
+    sid = r"\d+"
+
+
+def done(stage_id):
+    """Return the completion marker for a numbered stage."""
+    return f"outputs/.done/{stage_id}.done"
+
+
+def stage_inputs(wildcards):
+    """Return dependency markers for a numbered stage."""
+    # Ensure wildcard is treated as string matching STAGES keys
+    sid_str = str(wildcards.sid)
+    if sid_str not in STAGES:
+        return []
+
+    stage = STAGES[sid_str]
+    dependencies = stage.get("after") or []
+
+    inputs = []
+    for dependency in dependencies:
+        if str(dependency) == "databases":
+            inputs.append(DB_FLAG)
+        else:
+            inputs.append(done(dependency))
+
+    return inputs
+
+
+def stage_threads(wildcards):
+    """Return the configured thread count for a stage."""
+    sid_str = str(wildcards.sid)
+    if sid_str in STAGES:
+        return int(STAGES[sid_str].get("threads", 1))
+    return 1
+
+
+def stage_command(stage, log_file):
+    """Build the command for a stage."""
+    script = stage["script"]
+    script_path = os.path.join(SCRIPTS, script)
+
+    quoted_script = shlex.quote(script_path)
+    quoted_log = shlex.quote(str(log_file))
+    quoted_manifest = shlex.quote(MANIFEST)
+
+    # Stage 1 performs interactive input and creates the manifest.
+    if str(stage["id"]) == "1":
+        return (
+            f"test -f {quoted_script} || "
+            f"(echo '[ERROR] Script not found: {script_path}' >&2; exit 1); "
+            f"python -u {quoted_script} 2>&1 | tee {quoted_log}; "
+            f"test -s {quoted_manifest} || "
+            "(echo '[ERROR] Stage 1 did not create a non-empty "
+            "data manifest. Check the log and input selections.' >&2; "
+            "exit 1)"
+        )
+
+    # Ordinary analysis stages.
+    command = (
+        f"test -f {quoted_script} || "
+        f"(echo '[ERROR] Script not found: {script_path}' >&2; exit 1); "
+        f"python -u {quoted_script} > {quoted_log} 2>&1"
+    )
+
+    # Skip protein-only stages when Stage 1 found no real protein data.
+    if stage.get("guard") == "protein":
+        manifest_check = (
+            "python -c "
+            "\"import json,sys; "
+            f"p={MANIFEST!r}; "
+            "sys.exit(0 if json.load(open(p, encoding='utf-8'))"
+            ".get('has_real_protein', False) else 1)\""
+        )
+
+        command = (
+            f"if {manifest_check}; then "
+            f"{command}; "
+            f"else echo 'SKIPPED: no real protein data' > {quoted_log}; "
+            "fi"
+        )
+
+    return command
+
+
+# ------------------------------------------------------------
+# Default target
+# ------------------------------------------------------------
+
+rule all:
+    input:
+        [done(stage_id) for stage_id in STAGES]
+
+
+# ------------------------------------------------------------
+# Motif database setup
+# ------------------------------------------------------------
+
+rule databases:
+    output:
+        touch(DB_FLAG)
+    log:
+        "outputs/logs/databases.snakemake.log"
+    shell:
+        r"""
+        mkdir -p outputs/logs outputs/.done
+
+        test -f "{SCRIPTS}/00_setup_motif_databases.py" || {{
+            echo "[ERROR] Database setup script not found." >&2
+            exit 1
+        }}
+
+        python -u "{SCRIPTS}/00_setup_motif_databases.py" \
+            > "{log}" 2>&1
+        """
+
+
+# ------------------------------------------------------------
+# Numbered pipeline stages
+# ------------------------------------------------------------
+
+rule stage:
+    input:
+        stage_inputs
+    output:
+        touch("outputs/.done/{sid}.done")
+    log:
+        "outputs/logs/{sid}.snakemake.log"
+    threads:
+        stage_threads
+    wildcard_constraints:
+        sid=r"\d+"
+    run:
+        os.makedirs("outputs/logs", exist_ok=True)
+        os.makedirs("outputs/.done", exist_ok=True)
+
+        stage = STAGES[str(wildcards.sid)]
+        command = stage_command(stage, log[0])
+
+        shell("set -o pipefail; " + command)

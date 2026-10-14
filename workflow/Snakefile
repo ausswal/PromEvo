@@ -100,7 +100,7 @@ def stage_command(stage, log_file):
             "exit 1)"
         )
 
-    # Ordinary analysis stages.
+    # Ordinary analysis stages. Stage 01 must have written its manifest first.
     command = (
         f"test -f {quoted_script} || "
         f"(echo '[ERROR] Script not found: {script_path}' >&2; exit 1); "
@@ -124,7 +124,14 @@ def stage_command(stage, log_file):
             "fi"
         )
 
-    return command
+    # Applies to every stage after 01 (also protein-guarded ones, so a missing manifest
+    # is an error, never a silent skip).
+    require_manifest = (
+        f"test -s {quoted_manifest} || "
+        "(echo '[ERROR] Stage 01 output (outputs/.pipeline_data_manifest.json) is missing. "
+        "Run Stage 01 first; if outputs/.done/1.done exists, delete it.' >&2; exit 1)"
+    )
+    return f"{require_manifest}; {command}"
 
 
 # ------------------------------------------------------------

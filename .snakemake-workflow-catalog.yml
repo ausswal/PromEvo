@@ -1,0 +1,13 @@
+usage:
+  mandatory-flags:
+    desc: >-
+      Run from the folder that holds your input genome folders; results are written to outputs/ there.
+      Stage 01 asks questions interactively, so start the workflow from a terminal (or use the Colab notebook
+      in colab/). The PromEvo tools (MEME, MAFFT, OrthoFinder, DIAMOND, MCL, FastTree, ncbi-datasets-cli)
+      must be on PATH, for example from the promevo conda environment.
+    flags: "--cores 8"
+  software-stack-deployment:
+    conda: false
+    apptainer: false
+    apptainer+conda: false
+  report: false

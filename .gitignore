@@ -8,3 +8,6 @@ Ncbi_plasmodium/
 *_dashboard.html
 Entamoeba/
 Ncbi_plasmodium/
+.snakemake/
+__pycache__/
+outputs/

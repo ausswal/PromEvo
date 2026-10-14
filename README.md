@@ -143,3 +143,18 @@ Bairatisal, Darjeeling, West Bengal 734013, India
 ## License
 
 MIT. See `LICENSE.txt`.
+
+## Run as a Snakemake workflow
+
+PromEvo can also be run as a Snakemake workflow (`workflow/Snakefile`, `config/config.yaml`).
+One command sets up the motif databases, runs the interactive Stage 01, and then runs stages 2-17
+up to the comparative dashboard. Finished steps are skipped on re-runs.
+
+```bash
+conda activate promevo-smk            # an environment with PromEvo's tools and snakemake-minimal
+cd /path/to/folder/with/your/genome/folders
+snakemake -s /path/to/PromEvo/workflow/Snakefile --cores 8
+```
+
+Stage 01 asks its questions in the terminal. Use `-n` for a dry run.
+On Google Colab, open `colab/PromEvo_Colab.ipynb`; see `config/README.md` for configuration details.

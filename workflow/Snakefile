@@ -4,7 +4,10 @@ import shlex
 # Locate config and scripts relative to the repo (<repo>/workflow/Snakefile), not the
 # current folder, so the workflow can be run from any work folder (e.g. Colab/Drive).
 REPO = os.path.abspath(os.path.join(workflow.basedir, ".."))
+
+
 configfile: os.path.join(REPO, "config", "config.yaml")
+
 
 # ------------------------------------------------------------
 # Pipeline Banner & Startup Greeting
@@ -27,8 +30,10 @@ BANNER = r"""
 ==============================================================================
 """
 
+
 onstart:
     print(BANNER)
+
 
 # ------------------------------------------------------------
 # Configuration
@@ -41,9 +46,10 @@ STAGES = {str(stage["id"]): stage for stage in config["stages"]}
 MANIFEST = "outputs/.pipeline_data_manifest.json"
 DB_FLAG = "outputs/.done/databases.done"
 
+
 # Explicit global wildcard constraints
 wildcard_constraints:
-    sid = r"\d+"
+    sid=r"\d+",
 
 
 def done(stage_id):
@@ -111,7 +117,7 @@ def stage_command(stage, log_file):
     if stage.get("guard") == "protein":
         manifest_check = (
             "python -c "
-            "\"import json,sys; "
+            '"import json,sys; '
             f"p={MANIFEST!r}; "
             "sys.exit(0 if json.load(open(p, encoding='utf-8'))"
             ".get('has_real_protein', False) else 1)\""
@@ -138,31 +144,36 @@ def stage_command(stage, log_file):
 # Default target
 # ------------------------------------------------------------
 
+
 rule all:
     input:
-        [done(stage_id) for stage_id in STAGES]
+        [done(stage_id) for stage_id in STAGES],
 
 
 # ------------------------------------------------------------
 # Motif database setup
 # ------------------------------------------------------------
 
+
 rule databases:
     output:
-        touch(DB_FLAG)
+        touch(DB_FLAG),
     log:
-        "outputs/logs/databases.snakemake.log"
+        "outputs/logs/databases.snakemake.log",
+    conda:
+        "envs/promevo.yaml"
+    params:
+        script=f"{SCRIPTS}/00_setup_motif_databases.py",
     shell:
         r"""
         mkdir -p outputs/logs outputs/.done
 
-        test -f "{SCRIPTS}/00_setup_motif_databases.py" || {{
+        if [ ! -f "{params.script}" ]; then
             echo "[ERROR] Database setup script not found." >&2
             exit 1
-        }}
+        fi
 
-        python -u "{SCRIPTS}/00_setup_motif_databases.py" \
-            > "{log}" 2>&1
+        python -u "{params.script}" >"{log}" 2>&1
         """
 
 
@@ -170,22 +181,20 @@ rule databases:
 # Numbered pipeline stages
 # ------------------------------------------------------------
 
+
 rule stage:
     input:
-        stage_inputs
+        stage_inputs,
     output:
-        touch("outputs/.done/{sid}.done")
+        touch("outputs/.done/{sid}.done"),
     log:
-        "outputs/logs/{sid}.snakemake.log"
-    threads:
-        stage_threads
+        "outputs/logs/{sid}.snakemake.log",
     wildcard_constraints:
-        sid=r"\d+"
+        sid=r"\d+",
+    threads: stage_threads
     run:
         os.makedirs("outputs/logs", exist_ok=True)
         os.makedirs("outputs/.done", exist_ok=True)
-
         stage = STAGES[str(wildcards.sid)]
         command = stage_command(stage, log[0])
-
-        shell("set -o pipefail; " + command)
+        shell(f"set -o pipefail; {command}")

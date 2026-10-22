@@ -1,0 +1,23 @@
+name: promevo
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python =3.12
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib-base
+  - seaborn
+  - biopython
+  - openpyxl
+  - scikit-learn
+  - requests
+  - wget
+  - ncbi-datasets-cli
+  - mafft
+  - meme
+  - orthofinder
+  - diamond
+  - mcl
+  - fasttree
